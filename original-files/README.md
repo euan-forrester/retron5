@@ -1,0 +1,1 @@
+These are the original C++ source files from Hyperkin, where were placed into the public domain in this forum post https://www.retro5.net/viewtopic.php?f=5&t=67&start=10 and are copied here for ease of reference.
