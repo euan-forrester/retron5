@@ -34,8 +34,8 @@ class RetronDataHeader(NamedTuple):
     flags: int
     originalSize: int
     packedSize: int
+    dataOffset: int
     crc32: int
-    data: int
 
 # Command line arguments
 
@@ -58,7 +58,7 @@ with open(args.retronFilename, 'rb') as input_file:
 input_file.closed
 
 if args.debug:
-	print("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d crc32 0x%x. Header is %d bytes" % (retron_data_header.magic, retron_data_header.formatVersion, retron_data_header.flags, retron_data_header.originalSize, retron_data_header.packedSize, retron_data_header.crc32, RETRON_DATA_HEADER_SIZE))
+	print("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d data offset %d bytes crc32 0x%x. Header is %d bytes" % (retron_data_header.magic, retron_data_header.formatVersion, retron_data_header.flags, retron_data_header.originalSize, retron_data_header.packedSize, retron_data_header.dataOffset, retron_data_header.crc32, RETRON_DATA_HEADER_SIZE))
 
 # Check file format
 
