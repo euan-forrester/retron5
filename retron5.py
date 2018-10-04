@@ -3,6 +3,7 @@
 import sys
 import struct
 from typing import NamedTuple
+import argparse
 
 """
 The Retron5 data format is:
@@ -20,27 +21,38 @@ typedef struct
 } t_retronDataHdr;
 """
 
+MAGIC = 0x354E5452 # "RTN5"
+FORMAT_VERSION = 1
+FLAG_ZLIB_PACKED = 0x01
+RETRON_DATA_HEADER_FORMAT = "I H H I I I P" # The format of this string is described here: https://docs.python.org/3/library/struct.html#struct-format-strings
+
 class RetronDataHeader(NamedTuple):
     magic: int
-    format_version: int
+    formatVersion: int
     flags: int
     originalSize: int
     packedSize: int
     crc32: int
     data: int
 
-RetronDataHeaderFormat = "I H H I I I I P" # The format is described here: https://docs.python.org/3/library/struct.html#struct-format-strings
+parser = argparse.ArgumentParser(description="Read and write Retron5 save files")
 
-print("Our struct is %d bytes" % (struct.calcsize(RetronDataHeaderFormat)))
+parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False, help="Display debug information")
+requiredArguments = parser.add_argument_group('required arguments')
+requiredArguments.add_argument("-r", "--retron-file", dest="retronFilename", type=str, help="File in the Retron5 save file format", required=True)
 
-if (len(sys.argv) < 2):
-	print("Usage: retron5.py <input file>")
-	sys.exit(0)	
+args = parser.parse_args()
 
-input_filename = sys.argv[1]
-
-with open(input_filename, 'rb') as input_file:
+with open(args.retronFilename, 'rb') as input_file:
 	input_file_bytes = input_file.read()
 
-	retron_data = RetronDataHeader._make(struct.unpack_from(RetronDataHeaderFormat, input_file_bytes))
+	retron_data = RetronDataHeader._make(struct.unpack_from(RETRON_DATA_HEADER_FORMAT, input_file_bytes))
+
 input_file.closed
+
+if retron_data.magic != MAGIC:
+	print("Incorrect file format: magic did not match. Got magic %x instead of %x" % (retron_data.magic, MAGIC))
+	sys.exit(1)
+
+if args.debug:
+	print("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d crc32 0x%x" % (retron_data.magic, retron_data.formatVersion, retron_data.flags, retron_data.originalSize, retron_data.packedSize, retron_data.crc32))
