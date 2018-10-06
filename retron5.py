@@ -96,6 +96,9 @@ else:
     if args.debug:
         print("Data not compressed - skipping decompression step")
 
+if len(save_data) != retron_data_header.originalSize:
+        print("Corrupted save data: expected to find %d bytes but actually found %d" % (retron_data_header.originalSize, len(save_data)))
+
 save_data_crc32 = zlib.crc32(save_data)
 
 if args.debug:
