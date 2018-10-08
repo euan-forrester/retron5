@@ -42,17 +42,16 @@ class Retron5SaveFiles:
     RETRON_DATA_HEADER_SIZE = struct.calcsize(RETRON_DATA_HEADER_FORMAT)
 
     @staticmethod
-    def extractFromRetronSaveFile(inputFileName, outputDirectory):
+    def extractFromRetronSaveFile(inputFilename, outputFileName):
 
         # Read file
 
-        with open(args.retronFilename, 'rb') as input_file:
+        with open(inputFilename, 'rb') as input_file:
             retron_data_header_bytes = input_file.read(Retron5SaveFiles.RETRON_DATA_HEADER_SIZE)
             save_data_bytes = input_file.read()
-
-            retron_data_header = RetronDataHeader._make(struct.unpack_from(Retron5SaveFiles.RETRON_DATA_HEADER_FORMAT, retron_data_header_bytes))
-
         input_file.closed
+
+        retron_data_header = RetronDataHeader._make(struct.unpack_from(Retron5SaveFiles.RETRON_DATA_HEADER_FORMAT, retron_data_header_bytes))
 
         logging.debug("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d data offset %d bytes crc32 0x%x. Header is %d bytes" % (retron_data_header.magic, retron_data_header.formatVersion, retron_data_header.flags, retron_data_header.originalSize, retron_data_header.packedSize, retron_data_header.dataOffset, retron_data_header.crc32, Retron5SaveFiles.RETRON_DATA_HEADER_SIZE))
 
@@ -100,28 +99,78 @@ class Retron5SaveFiles:
 
         # Write out the save data
 
-        outputFilename = os.path.join(outputDirectory, inputFileName)
-        outputFilename += ".srm" # FIXME: Need to change this per platform?
-
         with open(outputFilename, 'wb') as output_file:
             bytes_written = output_file.write(save_data)
-
-            logging.debug("Wrote out %d bytes" % (bytes_written))
-
         output_file.closed
+
+        logging.debug("Wrote out %d bytes" % (bytes_written))
+        logging.info("Extracted %s => %s" % (inputFilename, outputFilename))
+
+    @staticmethod
+    def packToRetronSaveFile(inputFilename, outputFileName):
+
+        # Read in the data
+
+        with open(inputFilename, 'rb') as input_file:
+            save_data_bytes = input_file.read()
+        input_file.closed
+
+        # Compress it
+
+        save_data_uncompressed_size = len(save_data_bytes)
+        save_data_crc32 = zlib.crc32(save_data_bytes)
+        save_data_bytes_compressed = zlib.compress(save_data_bytes)
+        save_data_compressed_size = len(save_data_bytes_compressed)
+
+        logging.debug("Read in %d bytes. Calculated CRC32: 0x%x. Compressed to %d bytes." % (save_data_uncompressed_size, save_data_crc32, save_data_compressed_size))
+
+        # Create the header
+
+        retron_data_header = RetronDataHeader(
+            magic = Retron5SaveFiles.MAGIC,
+            formatVersion = Retron5SaveFiles.FORMAT_VERSION,
+            flags = Retron5SaveFiles.FLAG_ZLIB_PACKED,
+            originalSize = save_data_uncompressed_size,
+            packedSize = save_data_compressed_size,
+            dataOffset = Retron5SaveFiles.RETRON_DATA_HEADER_SIZE,
+            crc32 = save_data_crc32)
+
+        # Write out the header + compressed data
+
+        retron_data_header_packed = struct.pack(Retron5SaveFiles.RETRON_DATA_HEADER_FORMAT,
+            retron_data_header.magic,
+            retron_data_header.formatVersion,
+            retron_data_header.flags,
+            retron_data_header.originalSize,
+            retron_data_header.packedSize,
+            retron_data_header.dataOffset,
+            retron_data_header.crc32)
+
+        with open(outputFilename, 'wb') as output_file:
+            header_bytes_written = output_file.write(retron_data_header_packed)
+            save_data_bytes_written = output_file.write(save_data_bytes_compressed)
+        output_file.closed
+
+        logging.debug("Wrote out %d bytes for the header, and %d bytes for the compressed save data" % (header_bytes_written, save_data_bytes_written))
+        logging.info("Packed %s => %s" % (inputFilename, outputFilename))
+
 
 # Command line arguments
 
 parser = argparse.ArgumentParser(description="Read and write Retron5 save files")
 
 parser.add_argument("-d", "--debug", action="store_true", dest="debug", default=False, help="Display debug information")
+parser.add_argument("-t", "--to-retron", action="store_true", dest="toRetron", default=False, help="Convert to Retron5 format. Otherwise, convert from Retron5 format")
 requiredArguments = parser.add_argument_group('required arguments')
-requiredArguments.add_argument("-r", "--retron-file", dest="retronFilename", type=str, help="File in the Retron5 save file format", required=True)
+requiredArguments.add_argument("-i", "--input-file", dest="inputFilename", type=str, help="File to read in", required=True)
 requiredArguments.add_argument("-o", "--output-dir", dest="outputDirectory", type=str, help="Directory to place the outputted file", required=True)
 
 args = parser.parse_args()
 
-inputFileName = os.path.splitext(os.path.basename(args.retronFilename))[0] # Pull out just the file name: "/path/to/filename.ext" => "filename"
+baseFilename = os.path.splitext(os.path.basename(args.inputFilename))[0] # Pull out just the file name: "/path/to/filename.ext" => "filename"
+
+outputFilename = os.path.join(args.outputDirectory, baseFilename)
+outputFilename += ".srm" # FIXME: Need to change this per platform?
 
 log_level = logging.INFO
 if args.debug:
@@ -129,6 +178,10 @@ if args.debug:
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
-Retron5SaveFiles.extractFromRetronSaveFile(inputFileName, args.outputDirectory)
+if args.toRetron:
+    Retron5SaveFiles.packToRetronSaveFile(args.inputFilename, outputFilename)
+else:
+    Retron5SaveFiles.extractFromRetronSaveFile(args.inputFilename, outputFilename)
+
 
 sys.exit(0)
