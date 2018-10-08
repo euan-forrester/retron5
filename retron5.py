@@ -42,7 +42,7 @@ class Retron5SaveFiles:
     RETRON_DATA_HEADER_SIZE = struct.calcsize(RETRON_DATA_HEADER_FORMAT)
 
     @staticmethod
-    def extractFromRetronSaveFile(inputFileName):
+    def extractFromRetronSaveFile(inputFileName, outputDirectory):
 
         # Read file
 
@@ -100,8 +100,8 @@ class Retron5SaveFiles:
 
         # Write out the save data
 
-        outputFilename = os.path.join(args.outputDirectory, inputFileName)
-        outputFilename += ".sav" # FIXME: Need to change this per platform?
+        outputFilename = os.path.join(outputDirectory, inputFileName)
+        outputFilename += ".srm" # FIXME: Need to change this per platform?
 
         with open(outputFilename, 'wb') as output_file:
             bytes_written = output_file.write(save_data)
@@ -129,6 +129,6 @@ if args.debug:
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
-Retron5SaveFiles.extractFromRetronSaveFile(inputFileName)
+Retron5SaveFiles.extractFromRetronSaveFile(inputFileName, args.outputDirectory)
 
 sys.exit(0)
