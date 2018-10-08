@@ -24,12 +24,6 @@ typedef struct
 } t_retronDataHdr;
 """
 
-MAGIC = 0x354E5452 # "RTN5", except backwards
-FORMAT_VERSION = 1
-FLAG_ZLIB_PACKED = 0x01
-RETRON_DATA_HEADER_FORMAT = "I H H I I I I" # The format of this string is described here: https://docs.python.org/3/library/struct.html#struct-format-strings
-RETRON_DATA_HEADER_SIZE = struct.calcsize(RETRON_DATA_HEADER_FORMAT)
-
 class RetronDataHeader(NamedTuple):
     magic: int
     formatVersion: int
@@ -38,6 +32,83 @@ class RetronDataHeader(NamedTuple):
     packedSize: int
     dataOffset: int
     crc32: int
+
+class Retron5SaveFiles:
+
+    MAGIC = 0x354E5452 # "RTN5", except backwards
+    FORMAT_VERSION = 1
+    FLAG_ZLIB_PACKED = 0x01
+    RETRON_DATA_HEADER_FORMAT = "I H H I I I I" # The format of this string is described here: https://docs.python.org/3/library/struct.html#struct-format-strings
+    RETRON_DATA_HEADER_SIZE = struct.calcsize(RETRON_DATA_HEADER_FORMAT)
+
+    @staticmethod
+    def extractFromRetronSaveFile(inputFileName):
+
+        # Read file
+
+        with open(args.retronFilename, 'rb') as input_file:
+            retron_data_header_bytes = input_file.read(Retron5SaveFiles.RETRON_DATA_HEADER_SIZE)
+            save_data_bytes = input_file.read()
+
+            retron_data_header = RetronDataHeader._make(struct.unpack_from(Retron5SaveFiles.RETRON_DATA_HEADER_FORMAT, retron_data_header_bytes))
+
+        input_file.closed
+
+        logging.debug("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d data offset %d bytes crc32 0x%x. Header is %d bytes" % (retron_data_header.magic, retron_data_header.formatVersion, retron_data_header.flags, retron_data_header.originalSize, retron_data_header.packedSize, retron_data_header.dataOffset, retron_data_header.crc32, Retron5SaveFiles.RETRON_DATA_HEADER_SIZE))
+
+        # Check file format
+
+        if retron_data_header.magic != Retron5SaveFiles.MAGIC:
+            logging.error("Incorrect file format: magic did not match. Got magic 0x%x instead of 0x%x" % (retron_data_header.magic, Retron5SaveFiles.MAGIC))
+            sys.exit(1)
+
+        if retron_data_header.formatVersion > Retron5SaveFiles.FORMAT_VERSION:
+            logging.error("Incorrect file format: format version did not match. Got version 0x%x instead of 0x%x" % (retron_data_header.formatVersion, Retron5SaveFiles.FORMAT_VERSION))
+            sys.exit(1)
+
+        if retron_data_header.dataOffset != Retron5SaveFiles.RETRON_DATA_HEADER_SIZE:
+            logging.error("Incorrect file format: expected header size: %d bytes, but file specifies %d instead" % (Retron5SaveFiles.RETRON_DATA_HEADER_SIZE, retron_data_header.dataOffset))
+            sys.exit(1)
+
+        if retron_data_header.packedSize != len(save_data_bytes):
+            logging.error("Error reading file: expected %d bytes of save data but found %d instead" % (retron_data_header.packedSize, len(save_data_bytes)))
+            sys.exit(1)
+
+        # Pull the save data from the file
+
+        save_data = save_data_bytes
+
+        if (retron_data_header.flags & Retron5SaveFiles.FLAG_ZLIB_PACKED) != 0:
+
+            save_data = zlib.decompress(save_data_bytes)
+
+            logging.debug("Decompressed %d bytes into %d bytes; expected to find %d bytes" % (len(save_data_bytes), len(save_data), retron_data_header.originalSize))
+        else:
+            logging.debug("Data not compressed - skipping decompression step")
+
+        if len(save_data) != retron_data_header.originalSize:
+            logging.error("Corrupted save data: expected to find %d bytes but actually found %d" % (retron_data_header.originalSize, len(save_data)))
+            sys.exit(1)
+
+        save_data_crc32 = zlib.crc32(save_data)
+
+        logging.debug("Found crc32 0x%x; expected 0x%x" % (save_data_crc32, retron_data_header.crc32))
+
+        if save_data_crc32 != retron_data_header.crc32:
+            logging.error("Corrupted save data: CRC did not match. Expected 0x%x but got 0x%x", (retron_data_header.crc32, save_data_crc32))
+            sys.exit(1)
+
+        # Write out the save data
+
+        outputFilename = os.path.join(args.outputDirectory, inputFileName)
+        outputFilename += ".sav" # FIXME: Need to change this per platform?
+
+        with open(outputFilename, 'wb') as output_file:
+            bytes_written = output_file.write(save_data)
+
+            logging.debug("Wrote out %d bytes" % (bytes_written))
+
+        output_file.closed
 
 # Command line arguments
 
@@ -58,70 +129,6 @@ if args.debug:
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
-# Read file
-
-with open(args.retronFilename, 'rb') as input_file:
-	retron_data_header_bytes = input_file.read(RETRON_DATA_HEADER_SIZE)
-	save_data_bytes = input_file.read()
-
-	retron_data_header = RetronDataHeader._make(struct.unpack_from(RETRON_DATA_HEADER_FORMAT, retron_data_header_bytes))
-
-input_file.closed
-
-logging.debug("Read file and found magic 0x%x version 0x%x flags 0x%x originalSize %d packedSize %d data offset %d bytes crc32 0x%x. Header is %d bytes" % (retron_data_header.magic, retron_data_header.formatVersion, retron_data_header.flags, retron_data_header.originalSize, retron_data_header.packedSize, retron_data_header.dataOffset, retron_data_header.crc32, RETRON_DATA_HEADER_SIZE))
-
-# Check file format
-
-if retron_data_header.magic != MAGIC:
-	logging.error("Incorrect file format: magic did not match. Got magic 0x%x instead of 0x%x" % (retron_data_header.magic, MAGIC))
-	sys.exit(1)
-
-if retron_data_header.formatVersion > FORMAT_VERSION:
-    logging.error("Incorrect file format: format version did not match. Got version 0x%x instead of 0x%x" % (retron_data_header.formatVersion, FORMAT_VERSION))
-    sys.exit(1)
-
-if retron_data_header.dataOffset != RETRON_DATA_HEADER_SIZE:
-    logging.error("Incorrect file format: expected header size: %d bytes, but file specifies %d instead" % (RETRON_DATA_HEADER_SIZE, retron_data_header.dataOffset))
-    sys.exit(1)
-
-if retron_data_header.packedSize != len(save_data_bytes):
-    logging.error("Error reading file: expected %d bytes of save data but found %d instead" % (retron_data_header.packedSize, len(save_data_bytes)))
-    sys.exit(1)
-
-# Pull the save data from the file
-
-save_data = save_data_bytes
-
-if (retron_data_header.flags & FLAG_ZLIB_PACKED) != 0:
-
-	save_data = zlib.decompress(save_data_bytes)
-
-	logging.debug("Decompressed %d bytes into %d bytes; expected to find %d bytes" % (len(save_data_bytes), len(save_data), retron_data_header.originalSize))
-else:
-    logging.debug("Data not compressed - skipping decompression step")
-
-if len(save_data) != retron_data_header.originalSize:
-    logging.error("Corrupted save data: expected to find %d bytes but actually found %d" % (retron_data_header.originalSize, len(save_data)))
-    sys.exit(1)
-
-save_data_crc32 = zlib.crc32(save_data)
-
-logging.debug("Found crc32 0x%x; expected 0x%x" % (save_data_crc32, retron_data_header.crc32))
-
-if save_data_crc32 != retron_data_header.crc32:
-    logging.error("Corrupted save data: CRC did not match. Expected 0x%x but got 0x%x", (retron_data_header.crc32, save_data_crc32))
-    sys.exit(1)
-
-# Write out the save data
-
-outputFilename = os.path.join(args.outputDirectory, inputFileName)
-outputFilename += ".sav" # FIXME: Need to change this per platform?
-
-with open(outputFilename, 'wb') as output_file:
-    bytes_written = output_file.write(save_data)
-
-    logging.debug("Wrote out %d bytes" % (bytes_written))
-
-output_file.closed
+Retron5SaveFiles.extractFromRetronSaveFile(inputFileName)
 
 sys.exit(0)
