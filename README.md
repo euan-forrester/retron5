@@ -8,7 +8,7 @@ I have a bunch of cartridges from retro videogame systems like the NES, SNES, Ga
 
 I got a Retron5 because it seemed like the least expensive machine that can read a large number of different cartridge types, and one of its little-known features is that it can copy save game data from a cartridge to an SD card and back again.
 
-But the data is in a proprietary format, so I'm tied to our Retron5 and if it dies then I'm back to square one. 
+But the data is in a proprietary format, so I'm tied to the Retron5 and if it dies then I'm back to square one. 
 
 This script will convert this proprietary format into the more common format used by other emulators such as those included with the RetroPie, and also back again to load emulator saves onto a real cartridge.
 
