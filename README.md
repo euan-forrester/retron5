@@ -12,7 +12,7 @@ But the data is in a proprietary format, meaning that we're tied to our Retron5 
 
 This script will convert this proprietary format into the more common format used by other emulators such as those included with the RetroPie, and also back again if we want to load our emulator saves onto a real cartridge.
 
-So not only can we back up our save files, but then we can swap out those dying batteries and put our save files back onto our cartridges to last another 30 years.
+So not only can we back up our save files, but then we can swap out those dying batteries and put our save files back onto our cartridges to last another 30 years: https://www.youtube.com/watch?v=k7Xb6ucFcfU
 
 ## Data format
 
