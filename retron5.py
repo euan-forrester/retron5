@@ -170,7 +170,6 @@ args = parser.parse_args()
 baseFilename = os.path.splitext(os.path.basename(args.inputFilename))[0] # Pull out just the file name: "/path/to/filename.ext" => "filename"
 
 outputFilename = os.path.join(args.outputDirectory, baseFilename)
-outputFilename += ".srm" # FIXME: Need to change this per platform?
 
 log_level = logging.INFO
 if args.debug:
@@ -179,8 +178,10 @@ if args.debug:
 logging.basicConfig(format='%(levelname)s: %(message)s', level=log_level)
 
 if args.toRetron:
+    outputFilename += ".sav" 
     Retron5SaveFiles.packToRetronSaveFile(args.inputFilename, outputFilename)
 else:
+    outputFilename += ".srm" # FIXME: Need to change this per platform?
     Retron5SaveFiles.extractFromRetronSaveFile(args.inputFilename, outputFilename)
 
 
