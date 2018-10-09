@@ -4,15 +4,15 @@ Convert Retron5 save files to and from files that can be used by other emulators
 
 ## Intro
 
-If you have a bunch of cartridges from retro videogame systems like the NES, SNES, Gameboy, etc. then your save files may get lost as these 30 year old batteries slowly die.
+I have a bunch of cartridges from retro videogame systems like the NES, SNES, Gameboy, etc. and I was worried about losing my old save files as the 30 year old batteries powering the cartridges slowly die.
 
-The Retron5 may be the most cost-effective machine that can read a large number of different cartridge types, and one of its little-known features is that it can copy save game data from a cartridge to an SD card and back again.
+I got a Retron5 because it seemed like the least expensive machine that can read a large number of different cartridge types, and one of its little-known features is that it can copy save game data from a cartridge to an SD card and back again.
 
-But the data is in a proprietary format, meaning that we're tied to our Retron5 and if it dies then we're back to square one. 
+But the data is in a proprietary format, so I'm tied to our Retron5 and if it dies then I'm back to square one. 
 
-This script will convert this proprietary format into the more common format used by other emulators such as those included with the RetroPie, and also back again if we want to load our emulator saves onto a real cartridge.
+This script will convert this proprietary format into the more common format used by other emulators such as those included with the RetroPie, and also back again to load emulator saves onto a real cartridge.
 
-So not only can we back up our save files, but then we can swap out those dying batteries and put our save files back onto our cartridges to last another 30 years: https://www.youtube.com/watch?v=k7Xb6ucFcfU
+So I can back up my save files, and also swap out those dying batteries and put my save files back onto the cartridges to last another 30 years: https://www.youtube.com/watch?v=k7Xb6ucFcfU
 
 ## Data format
 
