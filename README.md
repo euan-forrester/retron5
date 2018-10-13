@@ -14,6 +14,56 @@ This script will convert this proprietary format into the more common format use
 
 So I can back up my save files, and also swap out those dying batteries and put my save files back onto the cartridges to last another 30 years: https://www.youtube.com/watch?v=k7Xb6ucFcfU
 
+## Sample calls
+
+Convert Retron5 save to emulator:
+
+```
+./retron5.py -i retron-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].sav -o emulator-saves-out/ -d
+```
+
+Convert emulator save to Retron5:
+
+```
+./retron5.py -i emulator-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].srm -o retron-saves-out/ -t -d
+```
+
+## Examples
+
+### Move cartridge save to emulator
+
+Start by creating a save on your cartridge
+
+![Initial cartridge save](https://c2.staticflickr.com/2/1921/45299287111_69a336f85a_c_d.jpg)
+
+Put the cartridge into your Retron5
+
+![Cartridge in Retron5](https://c2.staticflickr.com/2/1955/45250069522_2b4e2f235c_c_d.jpg)
+
+Select "SD Card" for the save data location
+
+![Use SD Card](https://c2.staticflickr.com/2/1943/31425372968_41a1a0773c_c_d.jpg)
+
+Copy the cartridge save data to the SD card
+
+![Copy save data to SD card](https://c2.staticflickr.com/2/1966/45250035422_a58531a58d_c_d.jpg)
+
+Copy the save file from the SD card onto your computer, and run 
+
+```
+./retron5.py -i retron-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].sav -o emulator-saves-out/ -d
+```
+
+Copy the outputted file onto your RetroPie (or however you're running your emulator), in the same directory as your ROM file and with the same name (but the `.srm` extension)
+
+![Copy emulator save beside ROM file](https://c2.staticflickr.com/2/1931/44386857895_14a3e60f64_c_d.jpg)
+
+Load up the ROM in your emulator and you'll see the same save data!
+
+![Run your emulator](https://c2.staticflickr.com/2/1919/45250012062_9ce1b0156a_c_d.jpg)
+
+### Move emulator save to cartridge
+
 ## Data format
 
 The Retron5 save format is described here: https://www.retro5.net/viewtopic.php?f=5&t=67&start=10
@@ -35,17 +85,3 @@ typedef struct
 ```
 
 It's a header and then a bunch of compressed data, so to unpack the file we need to read past the header and then uncompress the data.
-
-## Sample calls
-
-Convert Retron5 save to emulator:
-
-```
-./retron5.py -i retron-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].sav -o emulator-saves-out/ -d
-```
-
-Convert emulator save to Retron5:
-
-```
-./retron5.py -i emulator-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].srm -o retron-saves-out/ -t -d
-```
