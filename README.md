@@ -72,6 +72,28 @@ Load up the ROM in your emulator and you'll see the same save data!
 
 ### Move emulator save to cartridge
 
+Now we can update our save on the RetroPie (or other emulator)
+
+![Update emulator save](https://c2.staticflickr.com/2/1915/45249998342_ce37f99f7f_c_d.jpg)
+
+Then copy it from the RetroPie (or other emulator) over to our computer
+
+![Copy emulator save to computer](https://c2.staticflickr.com/2/1947/43484128090_c66b980398_z_d.jpg)
+
+Then run
+
+```
+./retron5.py -i emulator-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].srm -o retron-saves-out/ -t -d
+```
+
+We can then copy the outputted file to our SD card and put the SD card into the Retron5. On the Retron5 we select to copy the save data to the cartridge
+
+![Copy save data onto cartridge](https://c2.staticflickr.com/2/1970/43484127700_f78f39f8e3_c_d.jpg)
+
+And now our updated save game is available on the original cartridge!
+
+![Updated save on original cartridge](https://c2.staticflickr.com/2/1919/44577050744_96f2f364f8_c_d.jpg)
+
 ## Data format
 
 The Retron5 save format is described here: https://www.retro5.net/viewtopic.php?f=5&t=67&start=10
