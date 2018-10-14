@@ -14,6 +14,12 @@ This script will convert this proprietary format into the more common format use
 
 So I can back up my save files, and also swap out those dying batteries and put my save files back onto the cartridges to last another 30 years: https://www.youtube.com/watch?v=k7Xb6ucFcfU
 
+## Requirements
+
+This script requires Python 3, which you can find here: https://www.python.org/downloads/
+
+If you're using a Mac, you may want to install it via homebrew: https://docs.python-guide.org/starting/install3/osx/
+
 ## Sample calls
 
 Convert Retron5 save to emulator:
