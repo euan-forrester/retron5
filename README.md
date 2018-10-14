@@ -118,4 +118,4 @@ typedef struct
 } t_retronDataHdr;
 ```
 
-It's a header and then a bunch of compressed data, so to unpack the file we need to read past the header and then uncompress the data.
+It's a header and then a bunch of compressed data, so to unpack the file we need to read past the header and then uncompress the data. There's a few values in the header, like the original size and CRC32 (checksum) of the original data, that we can use to make sure that nothing has been corrupted.
