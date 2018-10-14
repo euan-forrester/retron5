@@ -66,7 +66,7 @@ Copy the outputted file onto your RetroPie (or however you're running your emula
 
 ![Copy emulator save beside ROM file](https://c2.staticflickr.com/2/1931/44386857895_14a3e60f64_c_d.jpg)
 
-Load up the ROM in your emulator and you'll see the same save data!
+Load up the ROM on your RetroPie (other other emulator) and you'll see the same save data!
 
 ![Run your emulator](https://c2.staticflickr.com/2/1919/45250012062_9ce1b0156a_c_d.jpg)
 
