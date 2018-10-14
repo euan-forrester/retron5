@@ -44,7 +44,7 @@ Start by creating a save on your cartridge
 
 ![Initial cartridge save](https://c2.staticflickr.com/2/1921/45299287111_69a336f85a_c_d.jpg)
 
-Put the cartridge into your Retron5
+Put the cartridge and an SD card into your Retron5
 
 ![Cartridge in Retron5](https://c2.staticflickr.com/2/1955/45250069522_2b4e2f235c_c_d.jpg)
 
@@ -86,7 +86,11 @@ Then run
 ./retron5.py -i emulator-saves-in/The\ Legend\ of\ Zelda\ -\ Oracle\ of\ Seasons\ \(U\)\ \[C\]\[\!\].srm -o retron-saves-out/ -t -d
 ```
 
-We can then copy the outputted file to our SD card and put the SD card into the Retron5. On the Retron5 we select to copy the save data to the cartridge
+We can then copy the outputted file to our SD card and put the SD card and cartridge into the Retron5. We need to make sure the file has the name the Retron5 expects for this game, and with the `.sav` extension. You can check which name the Retron5 expects by writing out the save data from the cartridge using the steps above. 
+
+![Cartridge in Retron5](https://c2.staticflickr.com/2/1955/45250069522_2b4e2f235c_c_d.jpg)
+
+On the Retron5 we select to copy the save data to the cartridge
 
 ![Copy save data onto cartridge](https://c2.staticflickr.com/2/1970/43484127700_f78f39f8e3_c_d.jpg)
 
