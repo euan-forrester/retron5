@@ -1,6 +1,6 @@
 # Retron5 save file converter
 
-Convert Retron5 save files to and from files that can be used by other emulators
+Convert Retron5 save files to and from files that can be used by the RetroPie and other emulators
 
 ## Intro
 
